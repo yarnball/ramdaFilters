@@ -4,9 +4,9 @@ Below you will find some information on how to perform common tasks.<br>
 You can find the most recent version of this guide [here](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md).
 
 # To do:
-[*] `selecteFilters` to pass to ramda functions (AND and OR)
-[*] AND ramda filters
-[*] OR ramda filters
+[] `selecteFilters` to pass to ramda functions (AND and OR)
+[] AND ramda filters
+[] OR ramda filters
 
 ## Table of Contents
 
