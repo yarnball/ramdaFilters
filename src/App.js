@@ -1,53 +1,58 @@
 import React from 'react';
-import { pluck, prop, filter, both, pipe, where, contains, flatten, uniq} from 'ramda'
+import { reject, pluck, prop, filter, allPass, pipe, where, contains, flatten, uniq, } from 'ramda';
 import { x } from './dummyData.js';
 
-const testFilter = pipe(
-  prop('movies'),
-  filter(
-    both(
-      where({ genres: pipe(pluck('name'), contains('SuperDooper')) }),
-      where({ genres: pipe(pluck('name'), contains('Drama')) }),
-      where({ genres: pipe(pluck('name'), contains('Book')) }),
-    ),
-  ),
-);
+const andFilter = (x, filters) => {
+    // if we have no filters, we just return everything
+    if (filters.length === 0) {
+      return x.movies;
+    }
+
+    const wheres = filters.map(g => where({
+      genres: pipe(pluck('name'), contains(g))
+    }));
+  
+    return pipe(
+      prop('movies'),
+      filter(
+        allPass(wheres)
+      )
+    )(x);
+}
+
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      movies: x.movies,
       selectedFilters: {},
     };
   }
+  
   handleChange = genre => {
     const { selectedFilters } = this.state;
-    const isCurrentlyActive = selectedFilters[genre];
-
+    selectedFilters[genre] = !selectedFilters[genre];
     this.setState({
       selectedFilters: {
-        ...selectedFilters,
-        [genre]: !isCurrentlyActive,
+        ...reject(v => !v, selectedFilters),
       },
     });
   };
-  testFilter = () => {
-    this.setState({ movies: testFilter(x) });
-  };
+
   uniqueGenres(movies) {
-    return pipe(pluck('genres'), flatten, pluck('name'), uniq)(
-      movies,
-    );
+    return pipe(pluck('genres'), flatten, pluck('name'), uniq)(movies);
   }
+    
   render() {
     const { selectedFilters } = this.state;
     console.log(selectedFilters);
-    const filteredMovies = this.state.movies;
+
+    const filteredResults = andFilter(x, Object.keys(selectedFilters));
+
     return (
       <div>
         Filters:<br />
-        {this.uniqueGenres(this.state.movies).map(e => (
+        {this.uniqueGenres(filteredResults).map(e => (
           <Filter1
             key={e}
             genre={e}
@@ -56,13 +61,27 @@ class App extends React.Component {
           />
         ))}
         <br />
-        <button onClick={this.testFilter}>Test filter</button>
-        <br />
         <h3>
-          {filteredMovies.map(movies => (
-            <li key={movies.id}> {movies.name} </li>
+          {filteredResults.map(movies => (
+            <Results key={movies.id} result={movies} />
           ))}
         </h3>
+      </div>
+    );
+  }
+}
+class Results extends React.Component {
+  render() {
+    const { result } = this.props;
+
+    return (
+      <div>
+        <li>
+          {result.name}
+        </li>
+        <il>
+          {result.genres.map(e => <span key={e.id}> {e.name} </span>)}
+        </il>
       </div>
     );
   }
@@ -85,6 +104,5 @@ class Filter1 extends React.Component {
     );
   }
 }
-
 
 export default App;
