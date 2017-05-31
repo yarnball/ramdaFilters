@@ -5,9 +5,9 @@ You can find the most recent version of this guide [here](https://github.com/fac
 
 ## Table of Contents
 
-- Using Ramda
+- Uses React.js, and Ramda
 
-## Get started:
+# To Get started:
 
 1. Run `npm install`
 2. Then `npm start`
