@@ -1,15 +1,14 @@
 import React from 'react';
-import { render } from 'react-dom';
-import R from 'ramda';
+import { pluck, prop, filter, both, pipe, where, contains, flatten, uniq} from 'ramda'
 import { x } from './dummyData.js';
 
-const testFilter = R.pipe(
-  R.prop('movies'),
-  R.filter(
-    R.both(
-      R.where({ genres: R.pipe(R.pluck('name'), R.contains('SuperDooper')) }),
-      R.where({ genres: R.pipe(R.pluck('name'), R.contains('Drama')) }),
-      R.where({ genres: R.pipe(R.pluck('name'), R.contains('Book')) }),
+const testFilter = pipe(
+  prop('movies'),
+  filter(
+    both(
+      where({ genres: pipe(pluck('name'), contains('SuperDooper')) }),
+      where({ genres: pipe(pluck('name'), contains('Drama')) }),
+      where({ genres: pipe(pluck('name'), contains('Book')) }),
     ),
   ),
 );
@@ -37,16 +36,13 @@ class App extends React.Component {
     this.setState({ movies: testFilter(x) });
   };
   uniqueGenres(movies) {
-    return R.pipe(R.pluck('genres'), R.flatten, R.pluck('name'), R.uniq)(
+    return pipe(pluck('genres'), flatten, pluck('name'), uniq)(
       movies,
     );
   }
   render() {
     const { selectedFilters } = this.state;
     console.log(selectedFilters);
-    const avGenres = Object.keys(this.state.movies).map(
-      e => this.state.movies[e],
-    );
     const filteredMovies = this.state.movies;
     return (
       <div>
@@ -89,5 +85,6 @@ class Filter1 extends React.Component {
     );
   }
 }
+
 
 export default App;
