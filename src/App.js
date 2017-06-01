@@ -1,6 +1,7 @@
 import React from 'react';
-import { reject, pluck, prop, filter, allPass, pipe, where, contains, flatten, uniq, } from 'ramda';
+import { reject, pluck, prop, filter, allPass, pipe, where, contains, flatten, uniqBy, } from 'ramda';
 import { x } from './dummyData.js';
+
 
 const andFilter = (x, filters) => {
     // if we have no filters, we just return everything
@@ -31,7 +32,7 @@ class App extends React.Component {
   
   handleChange = genre => {
     const { selectedFilters } = this.state;
-    selectedFilters[genre] = !selectedFilters[genre];
+    selectedFilters[genre.name] = !selectedFilters[genre.name];
     this.setState({
       selectedFilters: {
         ...reject(v => !v, selectedFilters),
@@ -40,7 +41,7 @@ class App extends React.Component {
   };
 
   uniqueGenres(movies) {
-    return pipe(pluck('genres'), flatten, pluck('name'), uniq)(movies);
+    return pipe(pluck('genres'), flatten, (uniqBy(prop('name'))), )(movies);
   }
     
   render() {
@@ -54,9 +55,9 @@ class App extends React.Component {
         Filters:<br />
         {this.uniqueGenres(filteredResults).map(e => (
           <Filter1
-            key={e}
+            key={e.id}
             genre={e}
-            isActive={!!selectedFilters[e]}
+            isActive={!!selectedFilters[e.name]}
             onChange={this.handleChange}
           />
         ))}
@@ -97,7 +98,7 @@ class Filter1 extends React.Component {
 
     return (
       <button onClick={this.handleClick}>
-        {genre}
+        {genre.name}
         {' '}
         <strong>{isActive ? 'Active' : 'Inactive'}</strong>
       </button>
